@@ -98,10 +98,7 @@ func (m model) View() string {
 		return "Unknown view"
 	}
 }
-
-// func main() {
-// 	p := tea.NewProgram(model{})
-// 	if _, err := p.Run(); err != nil {
-// 		fmt.Printf("Error: %v\n", err)
-// 	}
-// }
+func Run(m Model) error {
+	p := tea.NewProgram(m)
+	return p.Start()
+}
