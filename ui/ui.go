@@ -98,7 +98,9 @@ func (m model) View() string {
 		return "Unknown view"
 	}
 }
-func Run(m Model) error {
-	p := tea.NewProgram(m)
-	return p.Start()
+func Run(m Model) {
+	if _, err := tea.NewProgram(model{}).Run(); err != nil {
+		fmt.Printf("Uh oh, there was an error: %v\n", err)
+		os.Exit(1)
+	}
 }
