@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/twilio/twilio-go"
+
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 
@@ -59,6 +60,18 @@ func deleteStudioFlowLogs() {
 }
 
 func deleteConversationLogs() {
+	client := initClient()
+	messageRecords := GetMessageRecords(client)
+	for _, message := range messageRecords {
+		err := client.Api.DeleteMessage(*message.Sid, &twilioApi.DeleteMessageParams{})
+		if err != nil {
+			fmt.Printf("Error deleting call log %s: %v\n", *message.Sid, err)
+		} else {
+			fmt.Printf("Deleted call log %s\n", *message.Sid)
+		}
+	}
+
+	fmt.Println("Call logs deleted successfully.")
 }
 
 func deleteCallLogs() {
@@ -82,6 +95,14 @@ func GetCallRecords(client *twilio.RestClient) []twilioApi.ApiV2010Call {
 	callRecords, err := client.Api.ListCall(parameters)
 	checkError(err)
 	return callRecords
+}
+
+func GetMessageRecords(client *twilio.RestClient) []twilioApi.ApiV2010Message {
+	parameters := &twilioApi.ListMessageParams{}
+	parameters.SetPageSize(1000)
+	messageRecords, err := client.Api.ListMessage(parameters)
+	checkError(err)
+	return messageRecords
 }
 
 func checkError(err error) {
