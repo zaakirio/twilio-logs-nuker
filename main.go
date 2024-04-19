@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bubble-tea-test/ui"
 	"fmt"
 	"log"
 	"os"
+	"twilio-logs-nuker/ui"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"

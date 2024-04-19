@@ -1,8 +1,8 @@
 package ui
 
 import (
-	Handlers "bubble-tea-test/functions"
 	"fmt"
+	Handlers "twilio-logs-nuker/functions"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

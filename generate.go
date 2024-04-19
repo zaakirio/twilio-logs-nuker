@@ -1,8 +1,8 @@
 package main
 
 import (
-	Handlers "bubble-tea-test/functions"
 	"fmt"
+	Handlers "twilio-logs-nuker/functions"
 
 	"github.com/twilio/twilio-go"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
