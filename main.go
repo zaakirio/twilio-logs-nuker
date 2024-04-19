@@ -1,112 +1,36 @@
 package main
 
 import (
+	"bubble-tea-test/ui"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/twilio/twilio-go"
-
-	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/joho/godotenv"
 )
 
-func initClient() *twilio.RestClient {
-	accountSid := os.Getenv("TWILIO_ACCOUNT_SID")
-	authToken := os.Getenv("TWILIO_AUTH_TOKEN")
-	client := twilio.NewRestClientWithParams(twilio.ClientParams{
-		Username: accountSid,
-		Password: authToken,
-	})
-	return client
-}
-
 func main() {
-	fmt.Println("Twilio Log Deletion Tool")
-	fmt.Println("----------------------")
+	err := godotenv.Load()
 
-	for {
-		fmt.Println("\nSelect an option:")
-		fmt.Println("1. Delete Message Logs (by phone number)")
-		fmt.Println("2. Delete Studio Flow Logs (by Studio Flow SID)")
-		fmt.Println("3. Delete Conversation Logs (by phone number)")
-		fmt.Println("4. Delete Call Logs (by phone number)")
-		fmt.Println("5. Exit")
-
-		var choice int
-		fmt.Scanf("%d", &choice)
-
-		switch choice {
-		case 1:
-			deleteMessageLogs()
-		case 2:
-			deleteStudioFlowLogs()
-		case 3:
-			deleteConversationLogs()
-		case 4:
-			deleteCallLogs()
-		case 5:
-			fmt.Println("Exiting...")
-			os.Exit(0)
-		default:
-			fmt.Println("Invalid choice. Please try again.")
-		}
-	}
-}
-
-func deleteMessageLogs() {
-}
-
-func deleteStudioFlowLogs() {
-}
-
-func deleteConversationLogs() {
-	client := initClient()
-	messageRecords := GetMessageRecords(client)
-	for _, message := range messageRecords {
-		err := client.Api.DeleteMessage(*message.Sid, &twilioApi.DeleteMessageParams{})
-		if err != nil {
-			fmt.Printf("Error deleting call log %s: %v\n", *message.Sid, err)
-		} else {
-			fmt.Printf("Deleted call log %s\n", *message.Sid)
-		}
-	}
-
-	fmt.Println("Call logs deleted successfully.")
-}
-
-func deleteCallLogs() {
-	client := initClient()
-	callRecords := GetCallRecords(client)
-	for _, call := range callRecords {
-		err := client.Api.DeleteCall(*call.Sid, &twilioApi.DeleteCallParams{})
-		if err != nil {
-			fmt.Printf("Error deleting call log %s: %v\n", *call.Sid, err)
-		} else {
-			fmt.Printf("Deleted call log %s\n", *call.Sid)
-		}
-	}
-
-	fmt.Println("Call logs deleted successfully.")
-}
-
-func GetCallRecords(client *twilio.RestClient) []twilioApi.ApiV2010Call {
-	parameters := &twilioApi.ListCallParams{}
-	parameters.SetPageSize(1000)
-	callRecords, err := client.Api.ListCall(parameters)
-	checkError(err)
-	return callRecords
-}
-
-func GetMessageRecords(client *twilio.RestClient) []twilioApi.ApiV2010Message {
-	parameters := &twilioApi.ListMessageParams{}
-	parameters.SetPageSize(1000)
-	messageRecords, err := client.Api.ListMessage(parameters)
-	checkError(err)
-	return messageRecords
-}
-
-func checkError(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error loading .env file")
+	}
+
+	from_phone_number := os.Getenv("FROM_PHONE_NUMBER")
+	to_phone_number := os.Getenv("TO_PHONE_NUMBER")
+
+	if from_phone_number == "" || to_phone_number == "" {
+		log.Fatal("FROM_PHONE_NUMBER and TO_PHONE_NUMBER must be set in .env file")
+	}
+
+	// Move as an option later in bt
+	Generate(from_phone_number, to_phone_number)
+	m := ui.LoadModel()
+	p := tea.NewProgram(m, tea.WithAltScreen())
+
+	if _, err := p.Run(); err != nil {
+		fmt.Println("Error running program:", err)
+		os.Exit(1)
 	}
 }
